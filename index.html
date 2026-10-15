@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            text-align: center;
+            margin: 0;
+            padding: 50px 15px;
+        }
+
+        .container {
+            background: white;
+            max-width: 350px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px #ccc;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #dashboard {
+            display: none;
+        }
+
+        #message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="login">
+        <h2>User Login</h2>
+
+        <form id="loginForm">
+            <input type="text" id="username"
+                   placeholder="Enter username" required>
+
+            <input type="password" id="password"
+                   placeholder="Enter password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p id="message"></p>
+        <p>Demo: mano / 1234</p>
+    </div>
+
+    <div class="container" id="dashboard">
+        <h2>Dashboard</h2>
+        <h3>Welcome, <span id="displayName"></span>!</h3>
+        <p>You have successfully logged in.</p>
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <script>
+        const login = document.getElementById("login");
+        const dashboard = document.getElementById("dashboard");
+        const message = document.getElementById("message");
+
+        // Demo credentials
+        const validUsername = "mano";
+        const validPassword = "1234";
+
+        function showDashboard() {
+            // Check for an active session
+            const activeUser = sessionStorage.getItem("activeUser");
+
+            if (activeUser) {
+                const user = JSON.parse(activeUser);
+
+                login.style.display = "none";
+                dashboard.style.display = "block";
+                document.getElementById("displayName").textContent =
+                    user.username;
+            } else {
+                dashboard.style.display = "none";
+                login.style.display = "block";
+            }
+        }
+
+        // Handle login
+        document.getElementById("loginForm")
+            .addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                const username =
+                    document.getElementById("username").value.trim();
+                const password =
+                    document.getElementById("password").value;
+
+                if (username === validUsername &&
+                    password === validPassword) {
+
+                    const user = {
+                        username: username,
+                        loginTime: new Date().toLocaleString()
+                    };
+
+                    // Store user information persistently
+                    localStorage.setItem(
+                        "loggedInUser", JSON.stringify(user)
+                    );
+
+                    // Store active login for this browser tab session
+                    sessionStorage.setItem(
+                        "activeUser", JSON.stringify(user)
+                    );
+
+                    message.textContent = "";
+                    showDashboard();
+
+                } else {
+                    message.textContent =
+                        "Invalid username or password!";
+                }
+            });
+
+        // Handle logout
+        document.getElementById("logoutBtn")
+            .addEventListener("click", function() {
+                sessionStorage.removeItem("activeUser");
+                showDashboard();
+            });
+
+        // Check authorization whenever the page loads
+        showDashboard();
+    </script>
+
+</body>
+</html>
